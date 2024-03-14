@@ -1,13 +1,19 @@
 # Importar bibliotecas
 from shiny import App, render, ui, reactive
+from statsmodels.tsa.seasonal import STL
 import pandas as pd
 import plotnine as p9
 
 # Importar datos
-datos = pd.read_csv(
-    filepath_or_buffer="datos_tratados.csv",
-    converters={"Date": pd.to_datetime}
+datos = (
+    pd.read_csv(
+        filepath_or_buffer="datos_tratados.csv",
+        converters={"Date": pd.to_datetime}
     )
+    .assign(indice = lambda x: pd.to_datetime(x.Date))
+    .set_index("indice")
+    .asfreq("MS")
+)
 
 # Interfase de usuario
 app_ui = ui.page_navbar(
@@ -85,6 +91,26 @@ def server(input, output, session):
 
     @reactive.Calc
     def prepara_componentes():
+
+        fecha_inicial = input.fechas()[0].strftime("%Y-%m-%d") 
+        fecha_final = input.fechas()[1].strftime("%Y-%m-%d")
+        seleccion_componentes = input.componentes()
+
+        df = (
+            datos
+            .filter(
+                items = ["Date", input.indicator()],
+                axis = "columns"
+            )
+            .rename(columns = {input.indicador(): "indicador"})
+            .query("Date >= @data_inicial and Date <= @data_final")
+            .dropna()  
+        )
+
+        modelo = STL(endog = df.indicador, robust = True).fit()
+
+        tabla_componentes = 
+
         
     
     @output
