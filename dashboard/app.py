@@ -2,7 +2,8 @@
     # pip install shiny
     # python -m pip install statsmodels
     # pip install plotnine
-
+    # pip install python-bcb
+ 
 # Importar bibliotecas
 from shiny import App, render, ui, reactive
 from statsmodels.tsa.seasonal import STL
@@ -11,6 +12,7 @@ import plotnine as p9
 
 # Importar datos
 dados = (
+    
     pd.read_csv(
         filepath_or_buffer="datos_tratados.csv",
         converters={"Date": pd.to_datetime}
